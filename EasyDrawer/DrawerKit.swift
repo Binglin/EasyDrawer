@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import pop
 
 let kConst_DrawerScreenWidth  = UIScreen.mainScreen().bounds.width
 let kConst_DrawerScreenHeight = UIScreen.mainScreen().bounds.height
@@ -145,12 +144,6 @@ let animateKeyRightDrawerDissmiss = "drawer.right.dismiss"
 public class RightDrawer : DrawerStoryboardKit, UIGestureRecognizerDelegate{
     
     // MARK: property
-    let showAnim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
-    let alphaShow = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
-
-    let dismissAnim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
-    let alphaDismiss = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
-    
     var panGesture: UIPanGestureRecognizer!
     var dismissGesture: UITapGestureRecognizer!
     
@@ -173,13 +166,23 @@ public class RightDrawer : DrawerStoryboardKit, UIGestureRecognizerDelegate{
     }
     
     public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool{
-        /*
-        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
-            if CGRectContainsPoint(rightVC.animateSubView().frame, gestureRecognizer.locationInView(self.centerController.view)){
+        if gestureRecognizer == self.dismissGesture{
+            if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+                if CGRectContainsPoint(rightVC.animateSubView().frame, gestureRecognizer.locationInView(self.centerController.view)){
+                    return false
+                }
+            }
+        }
+
+        if gestureRecognizer == self.panGesture{
+            let locateX = gestureRecognizer.locationInView(self.centerController.view).x
+            if  locateX < 60 || locateX > kConst_DrawerScreenWidth / 2.0{
+                return true
+            }else{
                 return false
             }
         }
-        */
+        
         return true
     }
 
@@ -190,30 +193,11 @@ public class RightDrawer : DrawerStoryboardKit, UIGestureRecognizerDelegate{
         print("panned")
         switch sender.state{
         case .Began:
-            
-//            if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
-//                rightVC.animateSubView().layer.removeAllAnimations()
-//            }
-            self.rightController?.view.frame = CGRectMake(0, 0, kConst_DrawerScreenWidth, kConst_DrawerScreenHeight)
-             
+            self.panBegin(sender)
         case .Changed:
-            
-            let moveX = sender.translationInView(self.centerController.view).x
-
-            //左划
-            if moveX < 0{
-                self.rightPercentDriven(moveX/kConst_DrawerScreenWidth)
-            }
+            self.panMove(sender)
         case .Ended:
-            
-            let moveX = sender.translationInView(self.centerController.view).x
-            
-            
-            //左划
-            if moveX < 0 {
-                self.completePercentDriven(fabs(moveX / kConst_DrawerScreenWidth), cancel: (fabs(moveX) * 2 < kConst_DrawerScreenWidth/2.0))
-
-            }
+            self.panEnd(sender)
         default: break
 
         }
@@ -265,6 +249,40 @@ public class RightDrawer : DrawerStoryboardKit, UIGestureRecognizerDelegate{
             })
         }
     }
+    
+    
+    
+    
+    // MARK: private
+    public func panBegin(sender: UIPanGestureRecognizer){
+        self.rightController?.view.frame = CGRectMake(0, 0, kConst_DrawerScreenWidth, kConst_DrawerScreenHeight)
+    }
+    
+    public func panMove(sender: UIPanGestureRecognizer){
+        let moveX = sender.translationInView(self.centerController.view).x
+        let progress = moveX / kConst_DrawerScreenWidth
+        //左划
+        if moveX < 0{
+            self.rightPercentDriven(progress)
+        }else{
+            
+        }
+        if let center = self.centerController as? DrawerAnimateViewProtocol{
+            center.drawerActioned?(progress)
+        }
+    }
+    
+    public func panEnd(sender: UIPanGestureRecognizer){
+        let moveX = sender.translationInView(self.centerController.view).x
+        
+        
+        //左划
+        if moveX < 0 {
+            self.completePercentDriven(fabs(moveX / kConst_DrawerScreenWidth), cancel: (fabs(moveX) * 2 < kConst_DrawerScreenWidth/2.0))
+            
+        }
+    }
+    
     
     public func rightPercentDriven(percent: CGFloat) {
         

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: EasyDrawerViewController,DrawerViewLayoutProtocol {
+class ViewController: EasyDrawerViewController,DrawerViewLayoutProtocol, DrawerAnimateViewProtocol {
 
     override func viewDidLoad() {
         print(self.navigationController)
@@ -26,15 +26,23 @@ class ViewController: EasyDrawerViewController,DrawerViewLayoutProtocol {
         if let drawer = self.easyDrawer as? RightDrawer{
             drawer.showRightAnimation()
         }
-//        let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("Main")
-//        self.presentViewController(viewController, animated: true, completion: nil)
-        
-
     }
     
     func layoutDrawerView() {
         if let drawer = self.easyDrawer as? DrawerKit{
-//            drawer.leftController?.view.frame = CGRectMake(0, 10, 200, kConst_DrawerScreenHeight - 20)
+            drawer.leftController?.view.frame = CGRectMake(-200, 10, 200, kConst_DrawerScreenHeight - 20)
+        }
+    }
+    
+    func animateSubView() -> UIView {
+        return self.view
+    }
+
+    func drawerActioned(progress: CGFloat) {
+        if progress > 0 {
+            if let drawer = self.easyDrawer as? DrawerKit{
+                drawer.leftController?.view.frame = CGRectMake(-200 + 200 * progress * 2, 10, 200, kConst_DrawerScreenHeight - 20)
+            }
         }
     }
 }

@@ -37,5 +37,6 @@ class RightViewController: EasyDrawerViewController, DrawerAnimateViewProtocol {
       let mainSotry = UIStoryboard(name: "Main", bundle: nil)
       let right = mainSotry.instantiateViewControllerWithIdentifier("right")
         self.navigationController?.pushViewController(right, animated: true)
+        self.easyDrawer.rightDismissAnimation!()
     }
 }

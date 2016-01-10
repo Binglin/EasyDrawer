@@ -14,7 +14,8 @@ class LeftViewController: EasyDrawerViewController {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.purpleColor()
         // Do any additional setup after loading the view.
-                print(self.navigationController)
+
+        print(self.navigationController)
     }
 
     override func didReceiveMemoryWarning() {
