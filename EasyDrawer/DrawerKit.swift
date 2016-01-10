@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import pop
 
 let kConst_DrawerScreenWidth  = UIScreen.mainScreen().bounds.width
 let kConst_DrawerScreenHeight = UIScreen.mainScreen().bounds.height
@@ -147,19 +147,32 @@ public class RightDrawer : DrawerStoryboardKit{
     lazy var showAnimation    = CABasicAnimation(keyPath: "transform.translation.x")
     lazy var dismissAnimation = CABasicAnimation(keyPath: "transform.translation.x")
     var panGesture: UIPanGestureRecognizer!
+    var dismissGesture: UITapGestureRecognizer!
     
     // MARK: gesture
     public override func initialController() {
         super.initialController()
         self.panGesture = UIPanGestureRecognizer(target: self, action: "pannedAction:")
-//        self.centerController.view.addGestureRecognizer(self.panGesture)
+        self.centerController.view.addGestureRecognizer(self.panGesture)
+        
+        self.dismissGesture = UITapGestureRecognizer(target: self, action: "tappedAction:")
+        self.centerController.view.addGestureRecognizer(self.dismissGesture)
+        
+    }
+    
+    func tappedAction(sender: UITapGestureRecognizer){
+        
+        print("tapped")
+        self.rightDismissAnimation()
     }
     
     func pannedAction(sender: UIPanGestureRecognizer){
         
+        print("panned")
         switch sender.state{
         case .Began:
             self.showRightAnimation()
+//            self.showAnimation.pa
         case .Changed:
             let moveX = sender.translationInView(self.centerController.view).x
             self.rightPercentDriven(moveX/kConst_DrawerScreenWidth)
@@ -167,6 +180,9 @@ public class RightDrawer : DrawerStoryboardKit{
             let moveX = sender.translationInView(self.centerController.view).x
             if moveX >= kConst_DrawerScreenWidth/2.0{
                 //
+
+            }else{
+                self.rightDismissAnimation()
             }
         default: break
 
@@ -183,54 +199,54 @@ public class RightDrawer : DrawerStoryboardKit{
             
             let rightAnimateView = rightVC.animateSubView()
             
-            self.showAnimation.fromValue = rightAnimateView.frame.width
-            self.showAnimation.toValue   = 0
+            let anim = POPSpringAnimation(propertyNamed: kPOPLayerTranslationX)
+            anim.fromValue = kConst_DrawerScreenWidth as AnyObject
+            anim.toValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width as AnyObject
+                //NSValue(CGRect: CGRectMake(0, 0, 400, 400))
+            rightAnimateView.layer.pop_animationForKey("translateX")
+            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX")
             
-            rightAnimateView.layer.addAnimation(self.showAnimation, forKey: animateKeyRightDrawerShow)
+//            self.showAnimation.fromValue = rightAnimateView.frame.width
+//            self.showAnimation.toValue   = 0
+//            self.showAnimation.removedOnCompletion = false
+            
+//            rightAnimateView.layer.addAnimation(self.showAnimation, forKey: animateKeyRightDrawerShow)
         }
     }
     
     public func rightDismissAnimation() {
         
-        var frame = self.centerController!.view.frame
-        frame.origin.x = 0
-        self.rightController?.view.frame = frame
+        
 
         
         if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
             
             let rightAnimateView = rightVC.animateSubView()
-
-            self.dismissAnimation.fromValue = 0
-            self.dismissAnimation.toValue   = rightAnimateView.frame.width
-            self.dismissAnimation.delegate = self
+            let anim = POPSpringAnimation(propertyNamed: kPOPLayerTranslationX)
+            anim.fromValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width as AnyObject
+            anim.toValue =  kConst_DrawerScreenWidth as AnyObject
+            anim.velocity = 2
+            anim.completionBlock = { complete in
+                
+                var frame = self.centerController!.view.frame
+                frame.origin.x = kConst_DrawerScreenWidth
+                self.rightController?.view.frame = frame
+            }
             
-            rightAnimateView.layer.addAnimation(self.dismissAnimation, forKey: animateKeyRightDrawerDissmiss)
+            rightAnimateView.layer.pop_animationForKey("translateX.dismiss")
+            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX.dismiss")
 
+            
         }
     }
     
     public func rightPercentDriven(percent: CGFloat) {
         
         
-        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
-            
-            let rightAnimateView = rightVC.animateSubView()
-            rightAnimateView.layer.speed = 0
-            self.showAnimation.beginTime = self.showAnimation.duration * Double(percent)
-            
-        }
+//        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+//            
+//            
+//        }
 
-    }
-    
-    public override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
-        
-        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
-    
-                var frame = self.rightController!.view.frame
-                frame.origin.x = kConst_DrawerScreenWidth
-                self.rightController?.view.frame = frame
-                rightVC.animateSubView().layer.removeAnimationForKey(animateKeyRightDrawerDissmiss)
-        }
     }
 }

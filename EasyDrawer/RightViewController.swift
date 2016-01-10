@@ -35,12 +35,6 @@ class RightViewController: EasyDrawerViewController, DrawerAnimateViewProtocol {
         return self.viewContainer!
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let drawer = self.easyDrawer as? RightDrawer{
-             drawer.showRightAnimation()
-        }
-    }
-    
     /*
     // MARK: - Navigation
 
