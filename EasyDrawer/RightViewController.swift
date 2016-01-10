@@ -20,7 +20,8 @@ class RightViewController: EasyDrawerViewController, DrawerAnimateViewProtocol {
         
         let containerWidth = kConst_DrawerScreenWidth / 3.0 * 2
         
-        self.viewContainer = UIView(frame: CGRectMake(kConst_DrawerScreenWidth - containerWidth , 0, containerWidth , kConst_DrawerScreenHeight - 0))
+        self.viewContainer = UIView(frame: CGRectMake(kConst_DrawerScreenWidth - containerWidth , 0, containerWidth , kConst_DrawerScreenHeight))
+
         self.view.addSubview(self.viewContainer!)
         self.viewContainer?.backgroundColor = UIColor.yellowColor()
         // Do any additional setup after loading the view.
