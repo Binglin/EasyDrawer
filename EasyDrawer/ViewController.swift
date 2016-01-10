@@ -11,6 +11,7 @@ import UIKit
 class ViewController: EasyDrawerViewController,DrawerViewLayoutProtocol {
 
     override func viewDidLoad() {
+        print(self.navigationController)
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -32,7 +33,9 @@ class ViewController: EasyDrawerViewController,DrawerViewLayoutProtocol {
     }
     
     func layoutDrawerView() {
-        
+        if let drawer = self.easyDrawer as? DrawerKit{
+//            drawer.leftController?.view.frame = CGRectMake(0, 10, 200, kConst_DrawerScreenHeight - 20)
+        }
     }
 }
 

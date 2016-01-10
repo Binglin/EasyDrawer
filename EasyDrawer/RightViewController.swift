@@ -17,7 +17,7 @@ class RightViewController: EasyDrawerViewController, DrawerAnimateViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.lightGrayColor().colorWithAlphaComponent(0.7)
-        
+                print(self.navigationController)
     }
 
     override func didReceiveMemoryWarning() {
@@ -33,4 +33,9 @@ class RightViewController: EasyDrawerViewController, DrawerAnimateViewProtocol {
         self.button.alpha = fabs(progress)
     }
 
+    @IBAction func btnAction(sender: UIButton) {
+      let mainSotry = UIStoryboard(name: "Main", bundle: nil)
+      let right = mainSotry.instantiateViewControllerWithIdentifier("right")
+        self.navigationController?.pushViewController(right, animated: true)
+    }
 }
