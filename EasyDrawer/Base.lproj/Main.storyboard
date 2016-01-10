@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--Center Controller-->
@@ -67,10 +68,36 @@
                         <viewControllerLayoutGuide type="bottom" id="25j-Ce-Y0c"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Jj9-sK-0LZ">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PXH-IN-DPl">
+                                <rect key="frame" x="80" y="0.0" width="240" height="568"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ODf-Ah-q52">
+                                        <rect key="frame" x="8" y="23" width="46" height="30"/>
+                                        <state key="normal" title="Button"/>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.7036393782" blue="0.53704892260000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="PXH-IN-DPl" secondAttribute="height" multiplier="30:71" id="YV7-JO-Nh4"/>
+                                    <constraint firstAttribute="height" constant="568" id="Zru-vr-K5a"/>
+                                </constraints>
+                            </view>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="PXH-IN-DPl" firstAttribute="top" secondItem="Jj9-sK-0LZ" secondAttribute="top" id="RSg-s1-WUd"/>
+                            <constraint firstAttribute="trailing" secondItem="PXH-IN-DPl" secondAttribute="trailing" id="fDI-nE-H7v"/>
+                            <constraint firstItem="25j-Ce-Y0c" firstAttribute="top" secondItem="PXH-IN-DPl" secondAttribute="bottom" id="xWJ-Bv-Nhu"/>
+                        </constraints>
                     </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <connections>
+                        <outlet property="button" destination="ODf-Ah-q52" id="LJI-5K-i1t"/>
+                        <outlet property="viewContainer" destination="PXH-IN-DPl" id="WFt-gj-837"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="t6f-5f-yEE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

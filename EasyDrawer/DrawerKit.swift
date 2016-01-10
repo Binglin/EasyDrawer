@@ -18,6 +18,8 @@ let kConst_DrawerScreenHeight = UIScreen.mainScreen().bounds.height
 
 @objc public protocol DrawerAnimateViewProtocol{
     func animateSubView() -> UIView
+    //controller 中view根据progress管理显示进度
+    optional func drawerActioned(progress: CGFloat)
 }
 
 @objc public protocol EasyDrawer: NSObjectProtocol{
@@ -37,14 +39,12 @@ let kConst_DrawerScreenHeight = UIScreen.mainScreen().bounds.height
     optional func rightDismissAnimation()
     optional func rightPercentDriven(percent:Float)
     
+    optional func dismissDrawer()
 }
 
 public class EasyDrawerViewController : UIViewController{
     var easyDrawer: EasyDrawer!
 }
-
-
-
 
 public class DrawerKit: NSObject , EasyDrawer{
     
@@ -142,7 +142,7 @@ let animateKeyRightDrawerDissmiss = "drawer.right.dismiss"
 
 
 // MARK: Only right needed
-public class RightDrawer : DrawerStoryboardKit{
+public class RightDrawer : DrawerStoryboardKit, UIGestureRecognizerDelegate{
     
     // MARK: property
     let showAnim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
@@ -162,6 +162,7 @@ public class RightDrawer : DrawerStoryboardKit{
         
         self.dismissGesture = UITapGestureRecognizer(target: self, action: "tappedAction:")
         self.centerController.view.addGestureRecognizer(self.dismissGesture)
+        self.dismissGesture.delegate = self
         
     }
     
@@ -170,6 +171,19 @@ public class RightDrawer : DrawerStoryboardKit{
         print("tapped")
         self.rightDismissAnimation()
     }
+    
+    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool{
+        /*
+        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+            if CGRectContainsPoint(rightVC.animateSubView().frame, gestureRecognizer.locationInView(self.centerController.view)){
+                return false
+            }
+        }
+        */
+        return true
+    }
+
+
     
     func pannedAction(sender: UIPanGestureRecognizer){
         
@@ -269,6 +283,8 @@ public class RightDrawer : DrawerStoryboardKit{
             var frame = rightAnimateView.frame
             frame.origin.x = kConst_DrawerScreenWidth - rightAnimateView.frame.width * per
             rightAnimateView.frame = frame
+            
+            rightVC.drawerActioned?(percent)
         }
     }
     
