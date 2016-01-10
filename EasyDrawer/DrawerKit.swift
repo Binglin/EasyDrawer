@@ -183,15 +183,22 @@ public class RightDrawer : DrawerStoryboardKit{
             self.rightController?.view.frame = CGRectMake(0, 0, kConst_DrawerScreenWidth, kConst_DrawerScreenHeight)
              
         case .Changed:
+            
             let moveX = sender.translationInView(self.centerController.view).x
-            self.rightPercentDriven(moveX/kConst_DrawerScreenWidth)
-        case .Ended:
-            let moveX = sender.translationInView(self.centerController.view).x
-            if moveX >= kConst_DrawerScreenWidth/2.0{
-                //
 
-            }else{
-//                self.rightDismissAnimation()
+            //左划
+            if moveX < 0{
+                self.rightPercentDriven(moveX/kConst_DrawerScreenWidth)
+            }
+        case .Ended:
+            
+            let moveX = sender.translationInView(self.centerController.view).x
+            
+            
+            //左划
+            if moveX < 0 {
+                self.completePercentDriven(fabs(moveX / kConst_DrawerScreenWidth), cancel: (fabs(moveX) * 2 < kConst_DrawerScreenWidth/2.0))
+
             }
         default: break
 
@@ -210,26 +217,15 @@ public class RightDrawer : DrawerStoryboardKit{
             
             let animateTime = 0.1
             
-//            UIView.animateWithDuration(animateTime, animations: { () -> Void in
-//                
-//            })
+            rightAnimateView.frame = CGRectMake(kConst_DrawerScreenWidth, 0, rightAnimateView.frame.width, kConst_DrawerScreenHeight)
             
-
-            rightAnimateView.layer.removeAllAnimations()
+            self.rightController?.view.alpha = 0
             
-            let anim = showAnim
-            anim.fromValue = kConst_DrawerScreenWidth
-            anim.toValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
-            anim.duration = animateTime
-            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX")
-
-            let alphaAni = alphaShow
-            alphaAni.fromValue = 0
-            alphaAni.toValue   = 1
-            alphaAni.duration  = animateTime
-            
-            self.rightController?.view.pop_addAnimation(alphaAni, forKey: "showAlpha")
-        }
+            UIView.animateWithDuration(animateTime, animations: { () -> Void in
+                rightAnimateView.frame = CGRectMake(kConst_DrawerScreenWidth - rightAnimateView.frame.width, 0, rightAnimateView.frame.width, kConst_DrawerScreenHeight)
+                self.rightController?.view.alpha = 1
+            })
+         }
     }
     
     public func rightDismissAnimation() {
@@ -240,26 +236,19 @@ public class RightDrawer : DrawerStoryboardKit{
             
             let animateTime = 0.1
             
-            let anim = dismissAnim
-            anim.fromValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
-            anim.toValue =  kConst_DrawerScreenWidth
-            anim.duration = animateTime
-            anim.completionBlock = { complete in
-                
-                var frame = self.centerController!.view.frame
-                frame.origin.x = kConst_DrawerScreenWidth
-                self.rightController?.view.frame = frame
-            }
+            rightAnimateView.frame = CGRectMake(kConst_DrawerScreenWidth  - rightAnimateView.frame.width, 0, rightAnimateView.frame.width, kConst_DrawerScreenHeight)
             
-            let alphaAni = alphaDismiss
-            alphaAni.fromValue = 1
-            alphaAni.toValue   = 0
-            anim.duration  = animateTime
-
-            self.rightController?.view.pop_addAnimation(alphaAni, forKey: "fade")
+            self.rightController?.view.alpha = 1
             
-            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX.dismiss")
-            
+            UIView.animateWithDuration(animateTime,
+                animations: { () -> Void in
+                    rightAnimateView.frame = CGRectMake(kConst_DrawerScreenWidth, 0, rightAnimateView.frame.width, kConst_DrawerScreenHeight)
+                    self.rightController?.view.alpha = 0
+                }, completion: { (complete) -> Void in
+                    var frame = self.centerController!.view.frame
+                    frame.origin.x = kConst_DrawerScreenWidth
+                    self.rightController?.view.frame = frame
+            })
         }
     }
     
@@ -283,19 +272,22 @@ public class RightDrawer : DrawerStoryboardKit{
         }
     }
     
-    public func completePercentDriven(percent: CGFloat){
-        let anim = showAnim
+    public func completePercentDriven(percent: CGFloat, cancel: Bool){
         
+        print("complete percent \(percent)")
         if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
             
             let rightAnimateView = rightVC.animateSubView()
-            let animateTime = 0.1
 
-            anim.fromValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2
-            anim.toValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
-            anim.duration = animateTime
-            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX")
+            let animateTime = 0.3 * (1 - percent)
             
+            let destinationX = cancel ? kConst_DrawerScreenWidth : kConst_DrawerScreenWidth - rightAnimateView.frame.width
+            let destinationAlpha = CGFloat(cancel ? 0.0 : 1.0)
+            
+            UIView.animateWithDuration(Double(animateTime), animations: { () -> Void in
+                rightAnimateView.frame = CGRectMake(destinationX, 0, rightAnimateView.frame.width, kConst_DrawerScreenHeight)
+                self.rightController?.view.alpha = destinationAlpha
+            })
         }
     }
 }
