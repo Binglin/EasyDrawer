@@ -144,6 +144,13 @@ let animateKeyRightDrawerDissmiss = "drawer.right.dismiss"
 // MARK: Only right needed
 public class RightDrawer : DrawerStoryboardKit{
     
+    // MARK: property
+    let showAnim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
+    let alphaShow = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
+
+    let dismissAnim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
+    let alphaDismiss = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
+    
     var panGesture: UIPanGestureRecognizer!
     var dismissGesture: UITapGestureRecognizer!
     
@@ -169,8 +176,12 @@ public class RightDrawer : DrawerStoryboardKit{
         print("panned")
         switch sender.state{
         case .Began:
-            self.showRightAnimation()
-//            self.showAnimation.pa
+            
+//            if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+//                rightVC.animateSubView().layer.removeAllAnimations()
+//            }
+            self.rightController?.view.frame = CGRectMake(0, 0, kConst_DrawerScreenWidth, kConst_DrawerScreenHeight)
+             
         case .Changed:
             let moveX = sender.translationInView(self.centerController.view).x
             self.rightPercentDriven(moveX/kConst_DrawerScreenWidth)
@@ -180,7 +191,7 @@ public class RightDrawer : DrawerStoryboardKit{
                 //
 
             }else{
-                self.rightDismissAnimation()
+//                self.rightDismissAnimation()
             }
         default: break
 
@@ -198,14 +209,21 @@ public class RightDrawer : DrawerStoryboardKit{
             let rightAnimateView = rightVC.animateSubView()
             
             let animateTime = 0.1
+            
+//            UIView.animateWithDuration(animateTime, animations: { () -> Void in
+//                
+//            })
+            
 
-            let anim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
+            rightAnimateView.layer.removeAllAnimations()
+            
+            let anim = showAnim
             anim.fromValue = kConst_DrawerScreenWidth
             anim.toValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
             anim.duration = animateTime
             rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX")
 
-            let alphaAni = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
+            let alphaAni = alphaShow
             alphaAni.fromValue = 0
             alphaAni.toValue   = 1
             alphaAni.duration  = animateTime
@@ -222,7 +240,7 @@ public class RightDrawer : DrawerStoryboardKit{
             
             let animateTime = 0.1
             
-            let anim = POPBasicAnimation(propertyNamed: kPOPLayerTranslationX)
+            let anim = dismissAnim
             anim.fromValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
             anim.toValue =  kConst_DrawerScreenWidth
             anim.duration = animateTime
@@ -233,7 +251,7 @@ public class RightDrawer : DrawerStoryboardKit{
                 self.rightController?.view.frame = frame
             }
             
-            let alphaAni = POPBasicAnimation(propertyNamed: kPOPViewAlpha)
+            let alphaAni = alphaDismiss
             alphaAni.fromValue = 1
             alphaAni.toValue   = 0
             anim.duration  = animateTime
@@ -247,6 +265,37 @@ public class RightDrawer : DrawerStoryboardKit{
     
     public func rightPercentDriven(percent: CGFloat) {
         
+        print(percent)
+        
+        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+            
+            let currentPercent = fabs(percent) * 2
+            
+            let per = currentPercent > 1.0 ? 1.0 : currentPercent
+            
+            let rightAnimateView = rightVC.animateSubView()
+            
+            self.rightController?.view.alpha = per
+            
+            var frame = rightAnimateView.frame
+            frame.origin.x = kConst_DrawerScreenWidth - rightAnimateView.frame.width * per
+            rightAnimateView.frame = frame
+        }
+    }
+    
+    public func completePercentDriven(percent: CGFloat){
+        let anim = showAnim
+        
+        if let rightVC = self.rightController as? DrawerAnimateViewProtocol{
+            
+            let rightAnimateView = rightVC.animateSubView()
+            let animateTime = 0.1
 
+            anim.fromValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2
+            anim.toValue = kConst_DrawerScreenWidth - rightAnimateView.frame.width/2 * 3
+            anim.duration = animateTime
+            rightAnimateView.layer.pop_addAnimation(anim, forKey: "translateX")
+            
+        }
     }
 }
